@@ -45,9 +45,9 @@ def post_detail(request, id=None):  # retrive
 def post_list(request):  # list_iteams
     queryset_list = Post.objects.all() #.order_by("-timestamp")
 
-    paginator = Paginator(queryset_list, 25)  # Show 25 contacts per page
-
-    page = request.GET.get('page')
+    paginator = Paginator(queryset_list, 5)  # Show 25 contacts per page
+    page_request_var = "page"
+    page = request.GET.get(page_request_var)
     try:
         queryset = paginator.page(page)
     except PageNotAnInteger:
@@ -59,7 +59,8 @@ def post_list(request):  # list_iteams
 
     context = {
         "object_list": queryset,
-        "title": "List"
+        "title": "List",
+        "page_request_var": page_request_var
     }
     # if request.user.is_authenticated():
     #    context = {
