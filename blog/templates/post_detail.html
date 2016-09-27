@@ -16,7 +16,11 @@
 
     <div class='col-sm-8 col-sm-offset-2'>
         <div class="thumbnail">
+
         <h1>{{ title }} <small>{{instance.timestamp}}</small></h1>
+            {% if instance.image %}
+            <img src="{{instance.image.url}}" class="img-responsive">
+            {% endif %}
         <h4>
             Content: {{instance.content|linebreaks}}
             Updated: {{instance.updated|linebreaks}}

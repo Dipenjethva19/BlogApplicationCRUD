@@ -10,6 +10,9 @@
         <!--title: <a href="{% url "posts:detail" id=obj.id %}">{{obj.title}}</a>><br/>-->
         <div class="col-sm-12">
             <div class="thumbnail">
+                {% if obj.image %}
+                <img src="{{obj.image.url}}" class="img-responsive">
+                {% endif %}
                 <!--<img src="..." alt="...">-->
                 <div class="caption">
                     <h2>{{obj.id|linebreaks}}</h2>
