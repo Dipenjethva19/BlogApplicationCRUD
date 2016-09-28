@@ -5,31 +5,48 @@
 {% endblock head_title %}
 
 <style>
-    {% block style %}
-    h1{
+    {
+    %
+    block
+    style
+    %
+    }
+    h1 {
         color: #003366;
     }
-    {% endblock style %}
+
+    {
+    %
+    endblock
+    style
+    %
+    }
 </style>
 
 {% block content %}
 
-    <div class='col-sm-8 col-sm-offset-2'>
-        <div class="thumbnail">
+<div class='col-sm-8 col-sm-offset-2'>
+    <div class="thumbnail">
 
-        <h1>{{ title }} <small>{{instance.timestamp}}</small></h1>
-            {% if instance.image %}
-            <img src="{{instance.image.url}}" class="img-responsive">
-            {% endif %}
+        <h1>{{ title }}
+            <small>{{instance.timestamp}}</small>
+        </h1>
+        {% if instance.image %}
+        <img src="{{instance.image.url}}" class="img-responsive">
+        {% endif %}
         <h4>
             Content: {{instance.content|linebreaks}}
             Updated: {{instance.updated|linebreaks}}
 
             <!--<a href="/posts/">HOME</a>-->
 
-            <a href="{% url "posts:home" %}">HOME</a>
+            <a href="{% url " posts:home" %}">HOME</a>
             <br/>
             <br/>
+
+            <a href="https://www.facebook.com/sharer/sharer.php?u=http://CodingForEntrepreneurs.com/">
+                Share on Facebook
+            </a>
 
         </h4>
     </div>

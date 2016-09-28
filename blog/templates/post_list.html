@@ -7,7 +7,7 @@
         {% for obj in object_list %}
 
         <!--title: <a href="/posts/{{obj.id}}">{{obj.title}}</a>><br/>-->
-        <!--title: <a href="{% url "posts:detail" id=obj.id %}">{{obj.title}}</a>><br/>-->
+
         <div class="col-sm-12">
             <div class="thumbnail">
                 {% if obj.image %}
@@ -15,7 +15,7 @@
                 {% endif %}
                 <!--<img src="..." alt="...">-->
                 <div class="caption">
-                    <h2>{{obj.id|linebreaks}}</h2>
+                    <!--<h2>{{obj.id|linebreaks}}</h2>-->
                     <h3><a href="{{ obj.get_absolute_url }}">{{obj.title|linebreaks}}</a><small>{{obj.timestamp|timesince}} ago</small></h3>
                     <p>{{obj.content|linebreaks}}</p>
                     <p><a href="{{ obj.get_absolute_url }}" class="btn btn-primary" role="button">VIEW</a> </p>
