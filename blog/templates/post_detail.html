@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-
+{% load urlify %}
 {% block head_title %}
 {{ instance.title }} | {{ block.super }}
 {% endblock head_title %}
@@ -44,9 +44,11 @@
 
 
             <br/>
+            {{ instance.content|urlify }}
+            {{ instance.content|truncatechars:20 |urlify }}
 
             <br/>
-            {{ share_string }}</br>
+            {{ share_string|truncatechars:20 }}</br>
             <a href="https://www.facebook.com/sharer/sharer.php?u={{request.build_absolute_uri}}/">
                 Facebook
             </a>
