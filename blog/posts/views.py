@@ -1,3 +1,5 @@
+#from urllib import quote_plus
+from urllib.parse import quote_plus
 from django.contrib import messages
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404, redirect
@@ -35,9 +37,11 @@ def post_detail(request, slug=None):  # retrive
     # instance = Post.objects.get(id=2)
     instance = get_object_or_404(Post, slug=slug)
     # instance = get_object_or_404(Post, title="Hello,")
+    share_string = quote_plus(instance.content)
     context = {
         "title": instance.title,
         "instance": instance,
+        "share_string": share_string,
     }
     return render(request, "post_detail.html", context)
 
