@@ -1,11 +1,14 @@
-#from urllib import quote_plus
+# from urllib import quote_plus
 from urllib.parse import quote_plus
 from django.contrib import messages
-from django.http import HttpResponse, HttpResponseRedirect
+from django.db.models import Q
+from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.shortcuts import render, get_object_or_404, redirect
+from django.utils import timezone
 from .forms import PostForm
 from .models import Post
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+
 
 # Create your views here.
 def post_home(request):
@@ -13,14 +16,18 @@ def post_home(request):
 
 
 def post_create(request):
+    if not request.user.is_staff or not request.user.is_superuser:
+        raise Http404
+
     form = PostForm(request.POST or None, request.FILES or None)
     if form.is_valid():
         instance = form.save(commit=False)
+        instance.user = request.user
         print(form.cleaned_data.get("title"))
         instance.save()
         messages.success(request, "<a href ='#'>item </a>Successfully Created", extra_tags="html_safe")
         return HttpResponseRedirect(instance.get_absolute_url())
-    #    else:
+    # else:
     #        messages.error(request, "Fail to create")
 
     # if request.method == "POST":
@@ -37,6 +44,9 @@ def post_detail(request, slug=None):  # retrive
     # instance = Post.objects.get(id=2)
     instance = get_object_or_404(Post, slug=slug)
     # instance = get_object_or_404(Post, title="Hello,")
+    if instance.publish > timezone.now().date() or instance.draft:
+        if not request.user.is_staff or not request.user.is_superuser:
+            raise Http404
     share_string = quote_plus(instance.content)
     context = {
         "title": instance.title,
@@ -47,7 +57,18 @@ def post_detail(request, slug=None):  # retrive
 
 
 def post_list(request):  # list_iteams
-    queryset_list = Post.objects.all() #.order_by("-timestamp")
+    today = timezone.now().date()
+    queryset_list = Post.objects.active()  # filter(draft=False).filter(publish__lte=timezone.now()) #.order_by("-timestamp")
+    if request.user.is_staff or request.user.is_superuser:
+        queryset_list = Post.objects.all()
+
+    query = request.GET.get("q")
+    if query:
+        queryset_list = queryset_list.filter(Q(title__icontains=query) |
+                                             Q(content__icontains=query) |
+                                             Q(user__first_name__icontains=query) |
+                                             Q(user__last_name__icontains=query)
+                                             ).distinct()
 
     paginator = Paginator(queryset_list, 5)  # Show 25 contacts per page
     page_request_var = "page"
@@ -56,7 +77,7 @@ def post_list(request):  # list_iteams
         queryset = paginator.page(page)
     except PageNotAnInteger:
         # If page is not an integer, deliver first page.
-        queryset= paginator.page(1)
+        queryset = paginator.page(1)
     except EmptyPage:
         # If page is out of range (e.g. 9999), deliver last page of results.
         queryset = paginator.page(paginator.num_pages)
@@ -64,7 +85,8 @@ def post_list(request):  # list_iteams
     context = {
         "object_list": queryset,
         "title": "List",
-        "page_request_var": page_request_var
+        "page_request_var": page_request_var,
+        "today": today,
     }
     # if request.user.is_authenticated():
     #    context = {
@@ -80,10 +102,13 @@ def post_list(request):  # list_iteams
 
 
 def post_update(request, slug=None):
+    if not request.user.is_staff or not request.user.is_superuser:
+        raise Http404
     instance = get_object_or_404(Post, slug=slug)
     form = PostForm(request.POST or None, request.FILES or None, instance=instance)
     if form.is_valid():
         instance = form.save(commit=False)
+
         instance.save()
         messages.success(request, "Successfully Updated")
         return HttpResponseRedirect(instance.get_absolute_url())
@@ -97,6 +122,8 @@ def post_update(request, slug=None):
 
 
 def post_delete(request, slug=None):
+    if not request.user.is_staff or not request.user.is_superuser:
+        raise Http404
     instance = get_object_or_404(Post, slug=slug)
     instance.delete()
     messages.success(request, "Successfully Deleted")
